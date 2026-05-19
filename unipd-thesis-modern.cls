@@ -1,6 +1,6 @@
 % =============================================================
 %   LaTeX thesis template    ----------------------------------
-%   ver 1.1 //  major review 1.1  //  September 2024, 15th
+%   ver 1.2 //  major review 1.2  //  May 2026, 18th
 %
 %   by Francesco Barone, github.com/baronefr
 %   released under CC licence
@@ -30,17 +30,15 @@
 
 % page geometry
 \RequirePackage[
-  twoside,a4paper,
-  headheight=14pt,textwidth=5.3in, 
-  textheight=8.1866in, top=45mm
+  twoside, a4paper,
+  %textwidth=145mm, % I suggest to explicitly state inner & outer margins instead
+  inner=35mm, outer=25mm, % 1cm gutter
+  top=27mm, bottom=27mm,
+  headsep=5mm, headheight=14pt,
+  footskip=11mm,
+  marginparwidth=0mm, marginparsep=0mm, % not used in this template
 ]{geometry}
 
-
-% inverse page offset for book print
-\let\tmp\oddsidemargin
-\let\oddsidemargin\evensidemargin
-\let\evensidemargin\tmp
-\reversemarginpar  
 
 % packages to load here to avoid conflicts:
 \RequirePackage{scrextend}
@@ -48,21 +46,28 @@
 % ---------
 
 
-% language, font and encodings
-\RequirePackage{newpxtext} %,newpxmath
+
+% -- FONTS --
+
+%% OPTION 1 ------
+%%   newpxtext has some problems compiling to PDF/A, but generates
+%%   PDF/A correctly with LuaLaTeX
 \RequirePackage[T1]{fontenc}
-\RequirePackage{amsfonts}
+\RequirePackage{newpxtext} % add newpxmath optionally
+
+%% OPTION 2 ------
+%%   works with both pdfLaTeX and LuaLaTeX, slightly different font
+%\RequirePackage{mathpazo}
+%\RequirePackage{newpxmath} % (optional, depending on your tastes)
+
+%% OPTION 3 ------
+%\RequirePackage{tgpagella}
+%\RequirePackage{tgtermes}
+
+
+% -- LANGUAGE --
 \RequirePackage[english]{babel}
 
-
-% export in PDF/A or PDF/X
-\RequirePackage{etoolbox}
-\RequirePackage{colorprofiles}
-\RequirePackage[a-3a,latxmp,mathxmp]{pdfx}
-%   (to patch warnings)
-\selectcolormodel{natural}
-\RequirePackage{ninecolors}
-\selectcolormodel{rgb}
 
 
 
@@ -77,16 +82,15 @@
 
 
 % colors
-\RequirePackage{color}
-%\RequirePackage[table]{xcolor}
-
-    % generic colors
-    \definecolor{pastelgreen}{RGB}{0.01, 0.75, 0.24}
-    \definecolor{aliceblue}{RGB}{0.94, 0.97, 1.0}
+\RequirePackage[table]{xcolor}
     
     % color refs
     \definecolor{mainColor}{RGB}{155, 0, 20}
-    \definecolor{chapterColor}{RGB}{155, 0, 20}
+    \colorlet{chapterColor}{mainColor}
+    \colorlet{partBoxColor}{mainColor}
+    \colorlet{generalHyperColor}{mainColor}
+    %\definecolor{chapterColor}{RGB}{155, 0, 20}
+    %\definecolor{partBoxColor}{RGB}{155, 0, 20}
     %   Note: unipd color is {RGB}{155, 0, 20}
 
 
@@ -97,23 +101,8 @@
 \RequirePackage{bigints}
 \RequirePackage{makecell}
 \RequirePackage[bb=boondox]{mathalfa}
-\RequirePackage{dsfont}
+\RequirePackage{amsfonts}
 \RequirePackage{witharrows} % look this ans: https://tex.stackexchange.com/questions/12621/multi-line-equations-with-explanations-on-some-lines
-\RequirePackage{amsthm} % for theorems
-\RequirePackage{amssymb}
-
-
-
-
-
-
-\newcolumntype{L}{>{\raggedright\arraybackslash}X}
-\renewcommand{\appendixname}{}%
-\newcommand{\parallelslant}{\mathbin{\!/\mkern-5mu/\!}}
-\headsep = 30pt
-
-\newcommand{\equalexpl}[1]{%
-  \underset{\substack{\uparrow\\\mathrlap{\text{\hspace{-1em}#1}}}}{=}}
 
 
 
@@ -126,7 +115,7 @@
 
 \makeatletter
 \setlength{\@fptop}{0pt}
-% for aligning all floating figures/tables etc... to the top margin
+% aligning all floating figures/tables etc... to the top margin
 \makeatother
 
 % indent first line of paragraph
@@ -153,6 +142,9 @@
 % tables
 \RequirePackage{tabularx}
 \RequirePackage{multirow}
+
+
+
 
 
 
@@ -215,23 +207,41 @@
 \RequirePackage{fancyhdr} % custom headers and footers
 \RequirePackage[explicit]{titlesec} % custom title style
 
+% part style
+\titleformat{\part}[display]
+  {\centering}
+  {}
+  {0pt}
+  {%
+    \vspace*{\fill}
+    \vspace*{-9cm}
+    \setlength{\fboxsep}{5pt}
+    \colorbox{partBoxColor}{\color{white}\LARGE\bfseries \partname~\thepart}\\
+    \vspace{0.8cm}
+    {\Huge\bfseries #1}
+    \thispagestyle{empty}
+    \vspace*{\fill}
+  }
+
 
 % chapter style
+%% note: positioning is hard coded. to change vertical position, shift the yshift
+%% property of all nodes (the white chapterlabel, the black #1, and the origin node)
 \newcommand*\chapterlabel{}
 \titleformat{\chapter}[display]
 	{\normalfont\bfseries\Huge} % format of the chapter
 	{\gdef\chapterlabel{\thechapter\ }} % label 
  	{0pt} % separation between label and chapter-title
  	  {\begin{tikzpicture}[remember picture,overlay]
-    \node[yshift=-8cm] at (current page.north west)
+    \node[yshift=-6cm] at (current page.north west)
       {\begin{tikzpicture}[remember picture, overlay]
         \fill[chapterColor] (0,0) rectangle(35.5mm,15mm);
-        \node[anchor=north east,yshift=-7.1cm,xshift=32mm,minimum height=30mm,inner sep=0mm] at (current page.north west)
+        \node[anchor=north east,yshift=-5.1cm,xshift=32mm,minimum height=30mm,inner sep=0mm] at (current page.north west)
         {\parbox[top][30mm][t]{15mm}{\raggedleft 
         \color{white}\bfseries\chapterlabel}};
-        \node[anchor=north west,yshift=-7.1cm,xshift=45mm,text width=\textwidth,minimum height=30mm,inner sep=0mm] at (current page.north west)
+        \node[anchor=north west,yshift=-5.1cm,xshift=42mm,text width=\textwidth,minimum height=30mm,inner sep=0mm] at (current page.north west)
               {\parbox[top][30mm][t]{\textwidth}{\color{black}#1}};
-       \end{tikzpicture}
+        \end{tikzpicture}
       };
    \end{tikzpicture}
    \gdef\chapterlabel{}
@@ -242,10 +252,10 @@
 	{\gdef\chapterlabel{\thechapter\ }} % label 
  	{0pt} % separation between label and chapter-title
  	  {\begin{tikzpicture}[remember picture,overlay]
-    \node[yshift=-8cm] at (current page.north west)
+    \node[yshift=-6cm] at (current page.north west)
       {\begin{tikzpicture}[remember picture, overlay]
         \fill[chapterColor] (0,0) rectangle(35.5mm,15mm);
-        \node[anchor=north west,yshift=-7.1cm,xshift=45mm,text width=\textwidth,minimum height=30mm,inner sep=0mm] at (current page.north west)
+        \node[anchor=north west,yshift=-5.1cm,xshift=42mm,text width=\textwidth,minimum height=30mm,inner sep=0mm] at (current page.north west)
               {\parbox[top][30mm][t]{\textwidth}{\color{black}#1}};
        \end{tikzpicture}
       };
@@ -254,17 +264,27 @@
 }
 
 \renewcommand{\headrulewidth}{0pt} % remove line headers
-\titlespacing*{\chapter}{0pt}{50pt}{70pt}
+\titlespacing*{\chapter}{0pt}{0pt}{3cm}
 \renewcommand{\thesubsection}{\thesection.\alph{subsection}} % subsections with letters
 
 % style for headers and footers
 \newcommand{\setDefaultHF} {
     \fancyhf{}
-    \fancyhead[RO, LE]{\thepage}
-    \fancyhead[LO]{{\footnotesize\rightmark}}
-    \fancyhead[RE]{{\footnotesize\leftmark}}
+    \fancyfoot[RO, LE]{\thepage}
+    \fancyhead[LO]{{\footnotesize\nouppercase{\rightmark}}}
+    \fancyhead[RE]{{\bfseries\footnotesize\leftmark}}
 }
 
+%\setlength{\footskip}{40pt} % Increase to move footer further down
+
+
+% -- TOC --
+\RequirePackage[titles]{tocloft}
+
+% add some space before the section in ToC
+\setlength{\cftbeforesecskip}{2pt}
+% add more space before the Part in ToC
+\setlength{\cftbeforepartskip}{2em}
 
 
 % -- FRONTMATTER --
@@ -289,7 +309,7 @@
     \pagestyle{plain}
     \setlength{\headwidth}{\textwidth}
     \fancyhf{}
-    \fancyhead[RO, LE] {\thepage}
+    \fancyfoot[RO, LE] {\thepage}
     
     % custom titles 
     \def\abstractname{Abstract}
@@ -302,7 +322,9 @@
     \dedicationpage
     
     % insert table of contents
-    {\hypersetup{linkcolor=black}\titlespacing*{\chapter}{0pt}{10pt}{10pt}\tableofcontents}
+    {\hypersetup{linkcolor=black}%
+    \titlespacing*{\chapter}{0pt}{0pt}{0cm}% change contents header spacing (last value) if needed
+    \tableofcontents}
     \cleardoublepage
     
     % insert abstract
@@ -323,7 +345,7 @@
 
     %set custom geometry
     \newgeometry{
-        top=1.4cm, bottom=2cm,
+        top=2cm, bottom=2cm,
         inner=4cm, outer=2cm,
         headheight=0cm,includehead,includefoot
     }
@@ -333,7 +355,7 @@
 
     % add watermark
     \thiswatermark{\centering
-    \put(-294,-750){\includegraphics[width=1.4\linewidth]{template/unipdbg}}
+    \put(-300,-775){\includegraphics[width=1.4\linewidth]{template/unipdbg}} % (-297,-780)
     }
 
     % logo(s)
@@ -414,9 +436,9 @@
 \ifx\@dedication\empty \else
     % set empty style for this page (no headers and footers)
     \thispagestyle{empty}
-    
+    \vspace*{2cm}
     \phantomsection
-    
+
     \begin{flushright}
     \@dedication
     \end{flushright}
@@ -436,6 +458,7 @@
 \makeatother
 
 
+% -- COVER --
 
 % the following prints the cover page with bigger fonts and no watermark
 \makeatletter
@@ -529,11 +552,11 @@
     \ifx\arg\it
     \phantomsection
     \addcontentsline{toc}{section}{\abstractnameit}
-        \section*{\abstractnameit}
+        \section*{\LARGE\abstractnameit}
     \else
     \phantomsection
     \addcontentsline{toc}{chapter}{\abstractname}
-        \section*{\abstractname}
+        \section*{\LARGE\abstractname}
     \fi
 } {
     \vfill \null
@@ -587,6 +610,7 @@
 % -- BACKMATTER --
 \renewcommand{\backmatter}{
     %\cleardoublepage
+    \bookmarksetup{startatroot}
 
     % glossary
     \begingroup     
@@ -613,16 +637,31 @@
 \input{template/extras}
 
 
+
+% -- EXPORT --
+
+\RequirePackage{etoolbox}
+% The warning "Package pdfx Warning: Setting all color commands to rgb, consistent with the Color Model for PDF/A on input line 3126." is expected in pdfLaTeX 2025, so I will suppress it:
+\RequirePackage{silence}
+\WarningFilter{pdfx}{Setting all color commands to rgb}
+%
+\RequirePackage[a-2b]{pdfx}   % for PDF/A
+% change hypersetup settings after loading it in pdfx
+
 % -- LINKS SETUP --
-%\RequirePackage{hyperref}
 \hypersetup{
-  colorlinks,
-  citecolor=mainColor,
+  colorlinks=true,
+  citecolor=generalHyperColor,
   filecolor=black,
-  linkcolor=mainColor,
-  urlcolor=mainColor
+  linkcolor=generalHyperColor,
+  urlcolor=generalHyperColor,
+  pdfborder={0 0 0}
 }
 
+%   (to patch warnings on Overleaf 2024 pdfLaTeX)
+%\selectcolormodel{natural}
+%ninecolors}
+%\selectcolormodel{rgb}
 
-
-
+% for placing conclusions & backmatter at root in the document outline
+\RequirePackage{bookmark}
