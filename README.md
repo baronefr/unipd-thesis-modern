@@ -9,16 +9,10 @@ For a real-world example, you may also consult [my MSc thesis](https://hdl.handl
 
 ## Compilation
 
-### Recommended compiler
+**LuaLaTeX** is the recommended compiler for full PDF/A compatibility with the default font configuration.
 
-**LuaLaTeX** (recommended)
-
-This is the suggested compiler for full PDF/A compatibility with the default font configuration.
-
-
-### Alternative: pdfLaTeX
-
-The template can also be compiled with **pdfLaTeX**, but some PDF/A compatibility issues may arise when using the default `newpxtext` font package.
+Alternative: **pdfLaTeX**.
+The template works fine with **pdfLaTeX**, but some PDF/A compatibility issues may arise when using the default `newpxtext` font package (as of May 2026).
 
 If pdfLaTeX is required, consider switching to:
 ```latex
@@ -26,7 +20,8 @@ If pdfLaTeX is required, consider switching to:
 ```
 inside the class file.
 
-For further details, see the PDF/A compatibility notes in the demo document.
+> [!TIP]
+> For further details, see the PDF/A compatibility notes in the demo document.
 
 
 ## PDF/A compliance
@@ -35,11 +30,11 @@ The University submission system requires thesis manuscripts to be submitted as 
 
 This template enforces **PDF/A-2b** compliance through the `pdfx` package.
 
-Validation can be performed using online tools such as:
+> [!IMPORTANT]  
+> The PDF/A compliance can be broken later by the user, for instance, with transparencies in plots, new packages, etc.
+> Validation can be performed using online tools such as [pdfforge](https://www.pdfforge.org/online/en/validate-pdfa).
 
-- https://www.pdfforge.org/online/en/validate-pdfa
 
----
 
 ## Changelog
 
@@ -50,13 +45,13 @@ Validation can be performed using online tools such as:
 - Improved page geometry
 - Corrected bookmark hierarchy for backmatter sections
 
----
+
 
 ## License
 
 Released under CC license.
 
----
+
 
 ## Author
 
