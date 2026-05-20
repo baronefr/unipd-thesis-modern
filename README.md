@@ -6,6 +6,8 @@ Just a template for thesis at University of Padova.
 A full preview is available in the [compiled demo PDF](main.pdf).
 For a real-world example, you may also consult [my MSc thesis](https://hdl.handle.net/20.500.12608/65146), which was written using an earlier version of this template.
 
+The template is also available on [Overleaf](https://www.overleaf.com/latex/templates/unipd-modern-thesis-template/qxcgfbvhfjtn).
+
 
 ## Compilation
 
