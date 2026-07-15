@@ -154,6 +154,7 @@
 % thesis info
 \def\thesisHeader#1{\gdef\@thesisHeader{#1}}
 \def\academicYear#1{\gdef\@academicYear{#1}}
+\def\graduationDate#1{\gdef\@graduationDate{#1}}
 \def\studentId#1{\gdef\@studentId{#1}}
 \def\secondpage#1{\gdef\@secondpage{#1}}
 \def\dedication#1{\gdef\@dedication{#1}}
@@ -419,6 +420,10 @@
     \vspace*{\fill}
     \begin{flushleft}
     \normalsize\textsc{Academic Year \@academicYear}
+    \ifx\@graduationDate\empty \else
+		\\
+		\normalsize\textsc{Graduation Date: \@graduationDate}
+		\fi
     \end{flushleft}
     \vspace{5mm}
     
@@ -528,6 +533,10 @@
     \vspace*{\fill}
     \begin{flushleft}
     \Large\textsc{Academic Year \@academicYear}
+    \ifx\@graduationDate\empty \else
+		\\
+		\Large\textsc{Graduation Date: \@graduationDate}
+		\fi
     \end{flushleft}
     \vspace{5mm}
     
