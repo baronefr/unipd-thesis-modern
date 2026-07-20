@@ -1,6 +1,6 @@
 % =============================================================
 %   LaTeX thesis template    ----------------------------------
-%   ver 1.2 //  major review 1.2  //  May 2026, 18th
+%   ver 1.2.1 //  major review 1.2  //  July 2026, 20th
 %
 %   by Francesco Barone, github.com/baronefr
 %   released under CC licence
@@ -168,6 +168,7 @@
 % make these empty by default
 \coadvisor{}{}
 \otheradvisor{}{}
+\graduationDate{}
 \secondpage{}
 \dedication{}
 
