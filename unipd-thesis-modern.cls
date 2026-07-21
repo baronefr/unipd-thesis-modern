@@ -219,7 +219,6 @@
 % NOTE: loaded before pdfx to avoid conflicts
 
 \RequirePackage{fancyhdr} % custom headers and footers
-\RequirePackage[explicit]{titlesec} % custom title style
 
 % part style
 \titleformat{\part}[display]
