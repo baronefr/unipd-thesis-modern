@@ -1,6 +1,6 @@
 % =============================================================
 %   LaTeX thesis template    ----------------------------------
-%   ver 1.3 //  major review 1.3  //  July 2026, 22nd
+%   ver 1.3.0 //  major review 1.3  //  July 2026, 22nd
 %
 %   by Francesco Barone, github.com/baronefr
 %   released under CC licence
