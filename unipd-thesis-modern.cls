@@ -1,18 +1,18 @@
 % =============================================================
 %   LaTeX thesis template    ----------------------------------
-%   ver 1.2.1 //  major review 1.2  //  July 2026, 20th
+%   ver 1.3 //  major review 1.3  //  July 2026, 22nd
 %
 %   by Francesco Barone, github.com/baronefr
 %   released under CC licence
 %
-%   This template is available on overleaf and through the 
+%   This template is available on Overleaf and through the 
 %   following repository:
 %       https://github.com/baronefr/unipd-thesis-modern
 %
 % -------------------------------------------------------------
 %
 %  The cover of this thesis template and some elements of the 
-%  class structure has been adapted from this template:
+%  class structure have been adapted from this template:
 %   - Luca Martinelli: Computer Engineering MsC Thesis - UniPD,
 %     https://www.overleaf.com/latex/templates/computer-engineering-msc-thesis-unipd/yvnskxpfyfkc
 %
@@ -38,6 +38,17 @@
   footskip=11mm,
   marginparwidth=0mm, marginparsep=0mm, % not used in this template
 ]{geometry}
+
+
+% kwargs
+\RequirePackage{kvoptions}
+\SetupKeyvalOptions{
+  family=unipd,
+  prefix=unipd@
+}
+\DeclareStringOption[english]{language}
+
+\ProcessKeyvalOptions*
 
 
 % packages to load here to avoid conflicts:
@@ -66,7 +77,8 @@
 
 
 % -- LANGUAGE --
-\RequirePackage[english]{babel}
+\input{template/\unipd@language.tex}
+\RequirePackage[\unipd@language]{babel}
 
 
 
@@ -162,7 +174,7 @@
 % advisors
 \def\advisor#1#2{\gdef\@advisor{#1} \gdef\@advisorUniversity{#2}}
 \def\coadvisor#1#2{\gdef\@coadvisor{#1} \gdef\@coadvisorUniversity{#2}}
-\newcommand{\otheradvisor}[3][Internal Supervisor]{\gdef\@otheradvisor{#2} \gdef\@otheradvisorUniversity{#3} \gdef\@otheradvisorDenomination{#1}}
+\newcommand{\otheradvisor}[3][\UPD@internaladvisor]{\gdef\@otheradvisor{#2} \gdef\@otheradvisorUniversity{#3} \gdef\@otheradvisorDenomination{#1}}
 \makeatother
 
 % make these empty by default
@@ -378,19 +390,19 @@
     \end{spacing}
     \end{flushleft}
 
-    
+
     % author and advisors 
     \doublespacing
     \vspace{1.7cm}
     \begin{flushleft}
     
         \large{\textbf{\@author}} \\
-        \small{ ID \@studentId}\\
+        \small{\UPD@studentid~\@studentId}\\
 
     % supervisor
     \vspace{2.7cm}
     \begin{minipage}[t]{7cm}
-        \textsc{Supervisor}\\
+        \textsc{\UPD@advisor}\\
         {\setlength\parindent{1mm}
         \indent\large{\textbf{\@advisor}}\\
         \indent\small\textbf{\@advisorUniversity}
@@ -410,7 +422,7 @@
       % insert co-advisor, if not empty
       \ifx\@coadvisor\empty \else
         \vspace{1cm}
-        \textsc{Co-supervisor}\\
+        \textsc{\UPD@coadvisor}\\
         {\setlength\parindent{1mm}
         \indent\large{\textbf{\@coadvisor}}\\
         \indent\small\textbf{\@coadvisorUniversity}
@@ -420,10 +432,10 @@
 
     \vspace*{\fill}
     \begin{flushleft}
-    \normalsize\textsc{Academic Year \@academicYear}
+    \normalsize\textsc{\UPD@academicyear~\@academicYear}
     \ifx\@graduationDate\empty \else
 		\\
-		\normalsize\textsc{Graduation Date: \@graduationDate}
+		\normalsize\textsc{\UPD@graduationDate~\@graduationDate}
 		\fi
     \end{flushleft}
     \vspace{5mm}
@@ -499,11 +511,11 @@
     \doublespacing
     \begin{flushleft}
         \Large{\textbf{\@author}} \\
-        { ID \@studentId}\\
+        {\UPD@studentid~\@studentId}\\
     % supervisor
     \vspace{1.8cm}
     \begin{minipage}[t]{8cm}
-        \textsc{Supervisor}\\
+        \textsc{\UPD@advisor}\\
         {\setlength\parindent{1mm}
         \indent\Large{\textbf{\@advisor}}\\[-4mm]
         \large{\indent{\@advisorUniversity}}
@@ -523,7 +535,7 @@
       % insert co-advisor, if not empty
       \ifx\@coadvisor\empty \else
         \vspace{1cm}
-        \textsc{Co-supervisor}\\
+        \textsc{\UPD@coadvisor}\\
         {\setlength\parindent{1mm}
         \indent\Large{\textbf{\@coadvisor}}\\[-4mm]
         \large{\indent{\@coadvisorUniversity}}
@@ -533,10 +545,10 @@
 
     \vspace*{\fill}
     \begin{flushleft}
-    \Large\textsc{Academic Year \@academicYear}
+    \Large\textsc{\UPD@academicyear~\@academicYear}
     \ifx\@graduationDate\empty \else
 		\\
-		\Large\textsc{Graduation Date: \@graduationDate}
+		\Large\textsc{\UPD@graduationDate~\@graduationDate}
 		\fi
     \end{flushleft}
     \vspace{5mm}
