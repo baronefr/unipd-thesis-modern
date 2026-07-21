@@ -328,9 +328,6 @@
     % custom titles 
     \def\abstractname{Abstract}
     \def\abstractnameit{Sommario}
-    \def\listacronymname{Acronyms}
-    \def\acknowledgmentsname{Acknowledgments}
-    %\renewcommand{\bibname}{References}
     
     % insert dedication page
     \dedicationpage
@@ -592,6 +589,8 @@
     \input{docs/sommario}
 }
 
+% -- ACRONYMS/ABBREVIATIONS --
+\input{docs/glossary}
 
 
 % -- MAIN MATTER --
@@ -616,17 +615,12 @@
 
 
 % -- ACKNOWLEDGMENTS --
+\makeatletter
 \newcommand{\acknowledgments} {
-  \chapter*{\acknowledgmentsname}
-  \markboth{\acknowledgmentsname}{}
+  \chapter*{\UPD@acknowledgments}
+  \markboth{\UPD@acknowledgments}{}
   \input{docs/acknowledgments}
 }
-
-% -- ACRONYMS/ABBREVIATIONS --
-
-\input{docs/glossary}
-
-
 
 
 % -- BACKMATTER --
@@ -649,10 +643,10 @@
     % acknowledgments
     \cleardoublepage
     \phantomsection
-    \addcontentsline{toc}{chapter}{\acknowledgmentsname}
+    \addcontentsline{toc}{chapter}{\UPD@acknowledgments}
     \acknowledgments
 }
-
+\makeatother
 
 
 % -- EXTRAS --
