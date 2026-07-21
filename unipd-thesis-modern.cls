@@ -77,8 +77,8 @@
 
 
 % -- LANGUAGE --
-\input{template/\unipd@language.tex}
 \RequirePackage[\unipd@language]{babel}
+\input{template/\unipd@language.tex} % custom template strings for the selected language
 
 
 
@@ -174,7 +174,7 @@
 % advisors
 \def\advisor#1#2{\gdef\@advisor{#1} \gdef\@advisorUniversity{#2}}
 \def\coadvisor#1#2{\gdef\@coadvisor{#1} \gdef\@coadvisorUniversity{#2}}
-\newcommand{\otheradvisor}[3][\UPD@internaladvisor]{\gdef\@otheradvisor{#2} \gdef\@otheradvisorUniversity{#3} \gdef\@otheradvisorDenomination{#1}}
+\newcommand{\otheradvisor}[3][\UPD@otheradvisor]{\gdef\@otheradvisor{#2} \gdef\@otheradvisorUniversity{#3} \gdef\@otheradvisorDenomination{#1}}
 \makeatother
 
 % make these empty by default
