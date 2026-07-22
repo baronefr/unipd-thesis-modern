@@ -37,8 +37,37 @@ This template enforces **PDF/A-2b** compliance through the `pdfx` package.
 > Validation can be performed using online tools such as [pdfforge](https://www.pdfforge.org/online/en/validate-pdfa).
 
 
+## Language
+
+This template supports localization in both **English** and **Italian**. By default, the template uses **English**.
+
+To select a different language, use the `language` option when loading the document class:
+
+```latex
+\documentclass[
+    language=italian,
+]{unipd-thesis-modern}
+```
+
+The selected language is passed to `babel`, which automatically localizes all standard LaTeX elements, including chapter and section names, figure and table captions, the table of contents, bibliography titles, dates, and hyphenation rules.
+
+In addition, the template localizes all custom text that is not handled by `babel`, such as *Supervisor*, *Co-supervisor*, *Academic Year*, and *Student ID*.
+
+### Adding a new language
+
+You can extend the template to support additional languages by creating a new localization file in the `template/` directory. The file name must match one of the languages supported by `babel` (for example, `french.tex` or `german.tex`).
+
+Inside this file, define all language-specific macros used by the template, following the structure of the existing localization files (e.g., `english.tex` and `italian.tex`). Once the file is added, the new language can be selected through the `language` option of the document class.
+
+
 
 ## Changelog
+
+
+### v1.3
+
+- Add option for language (english and italian)
+
 
 ### v1.2
 

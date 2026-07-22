@@ -262,3 +262,23 @@ The available PDF/A workflows are summarized in Table~\ref{tab:pdfa}.
 \end{tabular}
 \caption{\label{tab:pdfa}Available workflows for PDF/A-compliant document generation.}
 \end{table}
+
+
+\section{Language}
+
+This template supports localization in both \textbf{English} and \textbf{Italian}. By default, the template uses \textbf{English}.
+To select a different language, use the \texttt{language} option when loading the document class:
+
+\begin{lstlisting}[language=TeX]
+\documentclass[
+    language=italian,
+]{unipd-thesis-modern}
+\end{lstlisting}
+
+The selected language is passed to \texttt{babel}, which automatically localizes all standard \LaTeX{} elements, including chapter and section names, figure and table captions, the table of contents, bibliography titles, dates, and hyphenation rules.
+
+In addition, the template localizes all custom text that is not handled by \texttt{babel}, such as \emph{Supervisor}, \emph{Co-supervisor}, \emph{Academic Year}, and \emph{Student ID}.\\
+
+You can extend the template to support additional languages by creating a new localization file in the \texttt{template/} directory. The file name must match one of the languages supported by \texttt{babel} (for example, \texttt{french.tex} or \texttt{german.tex}).
+
+Inside this file, define all language-specific macros used by the template, following the structure of the existing localization files (e.g., \texttt{english.tex} and \texttt{italian.tex}). Once the file has been added, the new language can be selected through the \texttt{language} option of the document class.

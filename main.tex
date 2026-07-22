@@ -1,7 +1,9 @@
-%!TEX TS-program = pdflatex
+%!TEX TS-program = lualatex
 %!TEX encoding = UTF-8 Unicode
 
-\documentclass{unipd-thesis-modern} % src: https://github.com/baronefr/unipd-thesis-modern
+\documentclass[%
+    %language=italian, % italian or english (default) localization
+]{unipd-thesis-modern} % src: https://github.com/baronefr/unipd-thesis-modern
 %  print layout: two-sided with binding on the left
 
 
@@ -25,7 +27,7 @@
 \title{A modern template for a thesis at\\ the University of Padova}
 \thesisHeader{Department of Physics and Astronomy ``G. Galilei''\\Master Thesis in Physics}
 \academicYear{2025/2026}
-% \graduationDate{14/07/2026} % (optional)
+% \graduationDate{22/07/2026} % (optional)
 
 % student
 \author{Student Name Surname}
@@ -76,7 +78,7 @@
     \part{\label{prt:demo}Demo of the template features} % NOTE: dividing in parts is optional
 
     \input{chapters/demo-basic}
-    % NOTE: I suggest to create a file for each chapter, like the previous \input{}.
+    % NOTE: I suggest creating a file for each chapter, like the previous \input{}.
 
 
     % II -----------------------
@@ -94,6 +96,6 @@
         \include{chapters/demo-appendix}
     \end{appendices}
 
-    % glossary, bibliography, acknowledges
+    % glossary, bibliography, acknowledgements
     \backmatter
 \end{document}
