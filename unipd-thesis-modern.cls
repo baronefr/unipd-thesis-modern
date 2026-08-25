@@ -1,6 +1,6 @@
 % =============================================================
 %   LaTeX thesis template    ----------------------------------
-%   ver 1.3.0 //  major review 1.3  //  July 2026, 22nd
+%   ver 1.3.1 //  major review 1.3  //  August 2026, 25th
 %
 %   by Francesco Barone, github.com/baronefr
 %   released under CC licence
@@ -184,6 +184,16 @@
 \secondpage{}
 \dedication{}
 
+% default logo assets (modern)
+\def\UPDlogoUnipdbg{template/unipdbg}
+\def\UPDlogoUniversis{template/universis}
+
+% switch to legacy logo assets (.old.pdf variants)
+\newcommand{\useoldlogo}{%
+  \gdef\UPDlogoUnipdbg{template/unipdbg.old}%
+  \gdef\UPDlogoUniversis{template/universis.old}%
+}
+
 
 
 
@@ -365,11 +375,11 @@
 
     % add watermark
     \thiswatermark{\centering
-    \put(-300,-775){\includegraphics[width=1.4\linewidth]{template/unipdbg}} % (-297,-780)
+    \put(-300,-775){\includegraphics[width=1.4\linewidth]{\UPDlogoUnipdbg}} % (-297,-780)
     }
 
     % logo(s)
-    {\hspace{-22.5mm}\noindent\printlogos[2.4cm]{template/universis}}
+    {\hspace{-22.5mm}\noindent\printlogos[2.4cm]{\UPDlogoUniversis}}
     %  NOTE: you can add a list of images to add more logos. Example:
     %      \printlogos[2.4cm]{template/universis}
 
@@ -488,7 +498,7 @@
     \thispagestyle{empty}
 
     % logo
-    {\hspace{-22.5mm}\noindent\printlogos[2.4cm]{template/universis}}
+    {\hspace{-22.5mm}\noindent\printlogos[2.4cm]{\UPDlogoUniversis}}
 
     % content
     \begin{flushleft}

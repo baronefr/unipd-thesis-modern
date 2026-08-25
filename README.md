@@ -67,6 +67,7 @@ Inside this file, define all language-specific macros used by the template, foll
 ### v1.3
 
 - Add option for language (english and italian)
+- Command `\useoldlogo` reverts the logo to the older (pre 2026) version. Check this requirement with your school/department.
 
 
 ### v1.2
