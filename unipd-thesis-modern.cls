@@ -1,6 +1,6 @@
 % =============================================================
 %   LaTeX thesis template    ----------------------------------
-%   ver 1.3.1 //  major review 1.3  //  August 2026, 25th
+%   ver 1.3.2 //  major review 1.3  //  November 2026, 4th
 %
 %   by Francesco Barone, github.com/baronefr
 %   released under CC licence
@@ -47,6 +47,9 @@
   prefix=unipd@
 }
 \DeclareStringOption[english]{language}
+\DeclareBoolOption[false]{boxedcaptions} % coloured square before caption labels
+\DeclareBoolOption[false]{boxedsections} % section numbers in a coloured box
+\DeclareBoolOption[false]{tight} % less vertical space after chapter titles
 
 \ProcessKeyvalOptions*
 
@@ -101,6 +104,8 @@
     \colorlet{chapterColor}{mainColor}
     \colorlet{partBoxColor}{mainColor}
     \colorlet{generalHyperColor}{mainColor}
+    \colorlet{boxedColor}{mainColor}     % used by boxedcaptions & boxedsections
+    \colorlet{boxedTextColor}{white}     % text inside the section number box
     %\definecolor{chapterColor}{RGB}{155, 0, 20}
     %\definecolor{partBoxColor}{RGB}{155, 0, 20}
     %   Note: unipd color is {RGB}{155, 0, 20}
@@ -267,6 +272,7 @@
         \end{tikzpicture}
       };
    \end{tikzpicture}
+   \unipdChapterExtraSkip{#1}
    \gdef\chapterlabel{}
 }
 % chapter style (numberless)
@@ -283,12 +289,53 @@
        \end{tikzpicture}
       };
    \end{tikzpicture}
+   \unipdChapterExtraSkip{#1}
    \gdef\chapterlabel{}
 }
 
 \renewcommand{\headrulewidth}{0pt} % remove line headers
 \titlespacing*{\chapter}{0pt}{0pt}{3cm}
 \renewcommand{\thesubsection}{\thesection.\alph{subsection}} % subsections with letters
+
+\makeatletter
+% option tight: reduce the space between chapter title and text
+%   The chapter title is drawn as an overlay, so LaTeX does not know its
+%   height: we measure it and add the space taken by the lines after the first.
+\newsavebox\unipd@chaptitlebox
+\newcommand\unipdChapterExtraSkip[1]{}
+\ifunipd@tight
+  \titlespacing*{\chapter}{0pt}{0pt}{0.95cm}
+  \renewcommand\unipdChapterExtraSkip[1]{%
+    \sbox\unipd@chaptitlebox{\parbox[t]{\textwidth}{#1}}%
+    \vspace*{\dp\unipd@chaptitlebox}%
+  }
+\fi
+
+% option boxedsections: section number inside a coloured box
+\ifunipd@boxedsections
+  \titleformat{\section}
+    {\normalfont\Large\bfseries}
+    {\colorbox{boxedColor}{\color{boxedTextColor}\kern0.15em\thesection\kern0.15em}}
+    {0.8em}{#1}
+  \titleformat{name=\section,numberless}
+    {\normalfont\Large\bfseries}{}{0pt}{#1}
+\fi
+
+% option boxedcaptions: coloured square before caption labels
+\ifunipd@boxedcaptions
+  \DeclareCaptionLabelFormat{boxed}{%
+    {\color{boxedColor}\rule{0.73em}{0.73em}}\hspace*{0.67em}\bothIfFirst{#1}{~}#2}
+  \captionsetup{labelformat=boxed}
+  % algorithm2e does not rely on the caption package -> patch it if loaded
+  \AtBeginDocument{%
+    \@ifpackageloaded{algorithm2e}{%
+      \renewcommand{\algocf@captiontext}[2]{%
+        {\color{boxedColor}\rule{0.73em}{0.73em}}\hspace*{0.67em}%
+        \small #1\algocf@capseparator\nobreakspace#2}%
+    }{}%
+  }
+\fi
+\makeatother
 
 % style for headers and footers
 \newcommand{\setDefaultHF} {
