@@ -1,6 +1,6 @@
 % =============================================================
 %   LaTeX thesis template    ----------------------------------
-%   ver 1.3.2 //  major review 1.3  //  November 2026, 4th
+%   ver 1.4.0 //  major review 1.4  //  November 2026, 6th
 %
 %   by Francesco Barone, github.com/baronefr
 %   released under CC licence
@@ -28,18 +28,6 @@
 % ref class
 \LoadClass[11pt, a4paper, twoside, openright]{book}
 
-% page geometry
-\RequirePackage[
-  twoside, a4paper,
-  %textwidth=145mm, % I suggest to explicitly state inner & outer margins instead
-  inner=35mm, outer=25mm, % 1cm gutter
-  top=27mm, bottom=27mm,
-  headsep=5mm, headheight=14pt,
-  footskip=11mm,
-  marginparwidth=0mm, marginparsep=0mm, % not used in this template
-]{geometry}
-
-
 % kwargs
 \RequirePackage{kvoptions}
 \SetupKeyvalOptions{
@@ -47,11 +35,31 @@
   prefix=unipd@
 }
 \DeclareStringOption[english]{language}
+\DeclareStringOption[156mm]{textwidth} % width of the text block (margins are computed)
 \DeclareBoolOption[false]{boxedcaptions} % coloured square before caption labels
 \DeclareBoolOption[false]{boxedsections} % section numbers in a coloured box
-\DeclareBoolOption[false]{tight} % less vertical space after chapter titles
+\DeclareStringOption[27.5mm]{chapterskip} % space between chapter title and text
+\DeclareBoolOption[false]{phdcover} % title page following the PhD school facsimile
+\DeclareBoolOption[false]{thmtriangles} % triangle marker in theorem headings
+\DeclareBoolOption[false]{oldlogo} % use the pre-2026 logos of the University
 
 \ProcessKeyvalOptions*
+
+
+% page geometry
+\RequirePackage[
+  twoside, a4paper,
+  textwidth=\unipd@textwidth, % class option textwidth (default 156mm)
+  bindingoffset=10mm,   % gutter, added to the inner margin
+  hmarginratio=1:1,     % split the remaining space equally
+  % (alternatively, state the margins explicitly, e.g. inner=32mm, outer=22mm)
+  top=27mm, bottom=27mm,
+  headsep=5mm, headheight=14pt,
+  footskip=11mm,
+  marginparwidth=0mm, marginparsep=0mm, % not used in this template
+]{geometry}
+
+
 
 
 % packages to load here to avoid conflicts:
@@ -106,9 +114,9 @@
     \colorlet{generalHyperColor}{mainColor}
     \colorlet{boxedColor}{mainColor}     % used by boxedcaptions & boxedsections
     \colorlet{boxedTextColor}{white}     % text inside the section number box
-    %\definecolor{chapterColor}{RGB}{155, 0, 20}
-    %\definecolor{partBoxColor}{RGB}{155, 0, 20}
-    %   Note: unipd color is {RGB}{155, 0, 20}
+    \colorlet{thmMarkerColor}{black!70}  % triangles of the thmtriangles option
+    \colorlet{sealColor}{black!70}       % seal on the phdcover title page
+    %   Bookeeping: unipd color is {RGB}{155, 0, 20}
 
 
 % mathematics
@@ -180,6 +188,17 @@
 \def\advisor#1#2{\gdef\@advisor{#1} \gdef\@advisorUniversity{#2}}
 \def\coadvisor#1#2{\gdef\@coadvisor{#1} \gdef\@coadvisorUniversity{#2}}
 \newcommand{\otheradvisor}[3][\UPD@otheradvisor]{\gdef\@otheradvisor{#2} \gdef\@otheradvisorUniversity{#3} \gdef\@otheradvisorDenomination{#1}}
+
+% PhD cover info (used only with the phdcover option)
+\def\department#1{\gdef\@department{#1}}
+\def\phdCourse#1{\gdef\@phdCourse{#1}}
+\def\phdCurriculum#1{\gdef\@phdCurriculum{#1}}
+\def\phdSeries#1{\gdef\@phdSeries{#1}}
+\def\phdCoordinator#1{\gdef\@phdCoordinator{#1}}
+\def\phdFunding#1{\gdef\@phdFunding{#1}} % full acknowledgement sentence
+% override a label of the PhD cover, e.g. \setphdlabel{student}{Dottoranda:}
+% keys: course, curriculum, series, coordinator, supervisor, cosupervisor, student
+\newcommand{\setphdlabel}[2]{\expandafter\gdef\csname UPD@phd#1\endcsname{#2}}
 \makeatother
 
 % make these empty by default
@@ -188,16 +207,33 @@
 \graduationDate{}
 \secondpage{}
 \dedication{}
+\department{}
+\phdCourse{}
+\phdCurriculum{}
+\phdSeries{}
+\phdCoordinator{}
+\phdFunding{}
 
 % default logo assets (modern)
 \def\UPDlogoUnipdbg{template/unipdbg}
 \def\UPDlogoUniversis{template/universis}
+% seal for the phdcover option: same drawing as unipdbg.pdf, but without its own
+% colour/opacity, so that it takes the current colour (sealColor)
+\def\UPDlogoSeal{template/seal}
 
 % switch to legacy logo assets (.old.pdf variants)
+%   use the class option oldlogo; the \useoldlogo command is kept for
+%   backward compatibility (v1.3) and does the same when used in the preamble
 \newcommand{\useoldlogo}{%
   \gdef\UPDlogoUnipdbg{template/unipdbg.old}%
   \gdef\UPDlogoUniversis{template/universis.old}%
+  \gdef\UPDlogoSeal{template/seal.old}%
 }
+\makeatletter
+\ifunipd@oldlogo
+  \useoldlogo
+\fi
+\makeatother
 
 
 
@@ -253,63 +289,93 @@
 
 
 % chapter style
-%% note: positioning is hard coded. to change vertical position, shift the yshift
-%% property of all nodes (the white chapterlabel, the black #1, and the origin node)
+%% Horizontal positions are relative to the left text margin of the page
+%% (\UPDchapmargin), so they follow the geometry settings:
+%%   - the coloured box spans from the page edge to 0.5mm past the margin
+%%   - the chapter number ends 3mm before the margin
+%%   - the title starts 7mm after the margin and ends at the right text margin
+%% To change the vertical position, edit the y values (distance from the page top).
+%%
+%% The heading is drawn in page coordinates through the shipout/background hook
+%% (origin = top-left corner of the page), so it is placed correctly at the
+%% first compilation, without relying on positions saved in the .aux file.
 \newcommand*\chapterlabel{}
+\newlength\UPDchapmargin
+\newsavebox\UPDchapbox
+% width of the chapter title (also used to measure it, see chapterskip below)
+\newcommand*\UPDchaptitlewidth{\dimexpr\textwidth-7mm\relax}
+% distance of the top of the chapter title from the top of the page
+\newcommand*\UPDchaptitletop{5.1cm}
+% #1: label (empty for numberless chapters), #2: title
+\newcommand{\UPDchapterhead}[2]{%
+  % left text margin of the current page (odd/even pages differ in twoside)
+  \ifodd\value{page}%
+    \setlength\UPDchapmargin{\dimexpr1in+\hoffset+\oddsidemargin\relax}%
+  \else
+    \setlength\UPDchapmargin{\dimexpr1in+\hoffset+\evensidemargin\relax}%
+  \fi
+  % typeset the heading now, place it on the page when it is shipped out
+  \global\setbox\UPDchapbox=\hbox{%
+    \begin{tikzpicture}[overlay]
+      \fill[chapterColor] (0,-6cm) rectangle ++(\UPDchapmargin+0.5mm,15mm);
+      \node[anchor=north east,minimum height=30mm,inner sep=0mm]
+        at (\UPDchapmargin-3mm,-\UPDchaptitletop)
+        {\parbox[top][30mm][t]{15mm}{\raggedleft\color{white}\bfseries #1}};
+      \node[anchor=north west,text width=\UPDchaptitlewidth,minimum height=30mm,inner sep=0mm]
+        at (\UPDchapmargin+7mm,-\UPDchaptitletop)
+        {\parbox[top][30mm][t]{\UPDchaptitlewidth}{\color{black}#2}};
+    \end{tikzpicture}}%
+  \AddToHookNext{shipout/background}{\put(0,0){\box\UPDchapbox}}%
+  \mbox{}% placeholder: keeps the vertical layout of the heading unchanged
+}
 \titleformat{\chapter}[display]
 	{\normalfont\bfseries\Huge} % format of the chapter
-	{\gdef\chapterlabel{\thechapter\ }} % label 
+	{\gdef\chapterlabel{\thechapter\ }} % label
  	{0pt} % separation between label and chapter-title
- 	  {\begin{tikzpicture}[remember picture,overlay]
-    \node[yshift=-6cm] at (current page.north west)
-      {\begin{tikzpicture}[remember picture, overlay]
-        \fill[chapterColor] (0,0) rectangle(35.5mm,15mm);
-        \node[anchor=north east,yshift=-5.1cm,xshift=32mm,minimum height=30mm,inner sep=0mm] at (current page.north west)
-        {\parbox[top][30mm][t]{15mm}{\raggedleft 
-        \color{white}\bfseries\chapterlabel}};
-        \node[anchor=north west,yshift=-5.1cm,xshift=42mm,text width=\textwidth,minimum height=30mm,inner sep=0mm] at (current page.north west)
-              {\parbox[top][30mm][t]{\textwidth}{\color{black}#1}};
-        \end{tikzpicture}
-      };
-   \end{tikzpicture}
+ 	{\UPDchapterhead{\chapterlabel}{#1}%
    \unipdChapterExtraSkip{#1}
    \gdef\chapterlabel{}
 }
 % chapter style (numberless)
 \titleformat{name=\chapter,numberless}[display]
 	{\normalfont\bfseries\Huge} % format of the chapter
-	{\gdef\chapterlabel{\thechapter\ }} % label 
+	{} % label
  	{0pt} % separation between label and chapter-title
- 	  {\begin{tikzpicture}[remember picture,overlay]
-    \node[yshift=-6cm] at (current page.north west)
-      {\begin{tikzpicture}[remember picture, overlay]
-        \fill[chapterColor] (0,0) rectangle(35.5mm,15mm);
-        \node[anchor=north west,yshift=-5.1cm,xshift=42mm,text width=\textwidth,minimum height=30mm,inner sep=0mm] at (current page.north west)
-              {\parbox[top][30mm][t]{\textwidth}{\color{black}#1}};
-       \end{tikzpicture}
-      };
-   \end{tikzpicture}
+ 	{\UPDchapterhead{}{#1}%
    \unipdChapterExtraSkip{#1}
-   \gdef\chapterlabel{}
 }
 
 \renewcommand{\headrulewidth}{0pt} % remove line headers
-\titlespacing*{\chapter}{0pt}{0pt}{3cm}
+\titlespacing*{\chapter}{0pt}{0pt}{0pt} % the space after the title is set by chapterskip
 \renewcommand{\thesubsection}{\thesection.\alph{subsection}} % subsections with letters
 
 \makeatletter
-% option tight: reduce the space between chapter title and text
-%   The chapter title is drawn as an overlay, so LaTeX does not know its
-%   height: we measure it and add the space taken by the lines after the first.
+% option chapterskip: space between the chapter title and the text.
+%   It is the white space between the baseline of the last line of the title
+%   and the top of the capital letters of the first line of text, so it does
+%   not depend on the length of the title, on the margins or on the fonts.
+%   The title is drawn as an overlay (see above) and LaTeX does not know its
+%   size, so the space after the heading is computed for each chapter:
+%     chapterskip + (cap height of the text) + (last baseline of the title)
+%     - (top of the text area) - (height of the heading material)
+%   where the heading material (empty lines of the titlesec display shape)
+%   takes 10.8pt + 2.3 times the \baselineskip of the chapter font.
+\newlength\UPDchapterskip
+\setlength\UPDchapterskip{\unipd@chapterskip}
+\newlength\UPD@capheight
 \newsavebox\unipd@chaptitlebox
-\newcommand\unipdChapterExtraSkip[1]{}
-\ifunipd@tight
-  \titlespacing*{\chapter}{0pt}{0pt}{0.95cm}
-  \renewcommand\unipdChapterExtraSkip[1]{%
-    \sbox\unipd@chaptitlebox{\parbox[t]{\textwidth}{#1}}%
-    \vspace*{\dp\unipd@chaptitlebox}%
-  }
-\fi
+\newif\ifUPDchapterskip \UPDchapterskiptrue % turned off for the ToC title
+\newcommand\unipdChapterExtraSkip[1]{%
+  \ifUPDchapterskip
+    % the box height is the distance from the top of the title to its last baseline
+    \sbox\unipd@chaptitlebox{\parbox[b]{\UPDchaptitlewidth}{#1}}%
+    {\normalfont\normalsize\global\UPD@capheight=\fontcharht\font`H\relax}%
+    \vspace*{\dimexpr \UPDchapterskip + \UPD@capheight
+      + \UPDchaptitletop + \ht\unipd@chaptitlebox
+      - (1in + \voffset + \topmargin + \headheight + \headsep)
+      - 10.8pt - \baselineskip*23/10 \relax}%
+  \fi
+}
 
 % option boxedsections: section number inside a coloured box
 \ifunipd@boxedsections
@@ -333,6 +399,24 @@
         {\color{boxedColor}\rule{0.73em}{0.73em}}\hspace*{0.67em}%
         \small #1\algocf@capseparator\nobreakspace#2}%
     }{}%
+  }
+\fi
+
+% option thmtriangles: triangle marker before theorem-like headings
+% (based on amsthm. affects the plain, definition and remark styles)
+\ifunipd@thmtriangles
+  \RequirePackage{amssymb} % \blacktriangleright
+  \RequirePackage{amsthm}
+  \newcommand{\UPD@thmmarker}{%
+    \textcolor{thmMarkerColor}{$\blacktriangleright$}\nobreakspace}
+  % default head font (plain and definition styles)
+  \thm@headfont{\UPD@thmmarker\bfseries}
+  % remark style: same as amsthm, plus the marker
+  \def\th@remark{%
+    \thm@headfont{\UPD@thmmarker\itshape}%
+    \normalfont % body font
+    \thm@preskip\topsep \divide\thm@preskip\tw@
+    \thm@postskip\thm@preskip
   }
 \fi
 \makeatother
@@ -391,6 +475,7 @@
     % insert table of contents
     {\hypersetup{linkcolor=black}%
     \titlespacing*{\chapter}{0pt}{0pt}{0cm}% change contents header spacing (last value) if needed
+    \UPDchapterskipfalse% (the chapterskip option does not apply to the ToC title)
     \tableofcontents}
     \cleardoublepage
     
@@ -502,6 +587,101 @@
 
 
 
+% -- PHD TITLE PAGE --
+% Layout of the PhD school facsimile (facsimile_frontespizio_tesi_phd):
+% seal on top, centred course info and title, names at the bottom.
+% Sizes and margins are taken from the official .docx template.
+\newcommand{\makephdtitle} {
+    \newgeometry{
+        top=62.7mm, bottom=12.5mm,
+        inner=15mm, outer=15mm,
+        headheight=0pt, headsep=0pt, footskip=0pt
+    }
+    \fancyhf{}
+    \thispagestyle{empty}
+
+    % seal, centred in the top margin (drawn in page coordinates when the
+    % page is shipped out, so it does not need a second compilation)
+    \AddToHookNext{shipout/background}{%
+        \put(0,0){\begin{tikzpicture}[overlay]
+            \node[anchor=north,inner sep=0pt] at (0.5\paperwidth,-13.1mm)
+                {\color{sealColor}\includegraphics[width=41.8mm]{\UPDlogoSeal}};
+        \end{tikzpicture}}%
+    }%
+
+    % The page is a stack of blocks. The gap before a block is added only if
+    % the block is printed, so empty fields leave no holes. Blocks spanning more
+    % lines push the following ones down; if the page gets too full, the gaps
+    % shrink (up to half their size) before anything spills to the next page.
+    {\centering
+        % university and department
+        {\fontsize{18}{21}\selectfont \UPD@university\par}
+        \ifx\@department\empty \else
+            \UPD@phdgap{8pt}
+            {\fontsize{16}{19}\selectfont \@department\par}
+        \fi
+
+        % course, curriculum and series (block skipped if all are empty)
+        \@tempswafalse
+        \ifx\@phdCourse\empty \else \@tempswatrue \fi
+        \ifx\@phdCurriculum\empty \else \@tempswatrue \fi
+        \ifx\@phdSeries\empty \else \@tempswatrue \fi
+        \if@tempswa
+            \UPD@phdgap{63pt}
+            {\fontsize{17}{21}\selectfont
+                \ifx\@phdCourse\empty \else
+                    \UPD@phdcourse~\@phdCourse\par
+                \fi
+                \ifx\@phdCurriculum\empty \else
+                    \UPD@phdcurriculum~\@phdCurriculum\par
+                \fi
+                \ifx\@phdSeries\empty \else
+                    \UPD@phdseries~\@phdSeries\par
+                \fi
+            }
+        \fi
+
+        % title
+        \UPD@phdgap{63pt}
+        {\fontsize{20}{24}\selectfont \@title\par}
+
+        % funding acknowledgement (optional, full sentence given by the user)
+        \ifx\@phdFunding\empty
+            \UPD@phdgap{78pt}
+        \else
+            \UPD@phdgap{78pt}
+            {\fontsize{14}{17}\selectfont \@phdFunding\par}
+            \UPD@phdgap{52pt}
+        \fi
+    }
+
+    % names
+    % (labels in bold, names in regular weight; \parskip spaces the lines)
+    {\fontsize{14}{17}\selectfont
+        \raggedright
+        \setlength{\parskip}{8pt}
+        \ifx\@phdCoordinator\empty \else
+            \textbf{\UPD@phdcoordinator}~\@phdCoordinator\par
+        \fi
+        \ifx\@advisor\empty \else
+            \textbf{\UPD@phdsupervisor}~\@advisor\par
+        \fi
+        \ifx\@coadvisor\empty \else
+            \textbf{\UPD@phdcosupervisor}~\@coadvisor\par
+        \fi
+        \UPD@phdgap{17pt}
+        {\raggedleft \textbf{\UPD@phdstudent}~\@author\par}
+    }
+
+    % leave the same line spacing as \maketitle does, so that the preamble
+    % pages (dedication, ToC, abstract) look the same with both covers
+    \doublespacing
+    \restoregeometry
+}
+% vertical gap between blocks of the PhD title page (shrinks if the page is full)
+\newcommand{\UPD@phdgap}[1]{\par\vspace{#1 minus 0.5\dimexpr#1\relax}}
+
+
 % -- DEDICATION --
 \newcommand{\dedicationpage} {
 \ifx\@dedication\empty \else
@@ -610,6 +790,12 @@
     \restoregeometry
     %\onehalfspacing
 }
+
+% option phdcover: replace both cover styles with the PhD school title page
+\ifunipd@phdcover
+    \let\maketitle\makephdtitle
+    \let\makecover\makephdtitle
+\fi
 \makeatother
 
 

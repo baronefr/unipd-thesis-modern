@@ -1,6 +1,254 @@
 %!TEX root = ../main.tex
 
-\chapter{Basic template features}\label{ch:feats}
+\chapter{Template features}\label{ch:feats}
+
+This chapter is divided in two parts.
+First, it describes the features that are specific to this template: localization, logos, PDF/A compliance, the PhD cover, and the options to customize the style of the document (Sections~\ref{sec:logos}--\ref{sec:custom}).
+Then, it shows how the most common \LaTeX{} features look like in this template, starting from Section~\ref{sec:text}.
+
+
+\section{Logos}\label{sec:logos}
+
+By default, the template is using the new logo of the University of Padova.
+If required by your department/school, you can switch to the old logo with the \texttt{oldlogo} option of the document class:
+\begin{lstlisting}[language=TeX]
+\documentclass[
+    oldlogo,
+]{unipd-thesis-modern}
+\end{lstlisting}
+The option switches all the logos used by the template at once: the logo on the cover, the seal in the background of the cover, and the seal on top of the PhD cover (Section~\ref{sec:phdcover}).
+Below, the new logo of the University of Padova (right), used by default, and the old one (left), set by the \texttt{oldlogo} option.
+For backward compatibility, the \verb|\useoldlogo| command of previous versions of the template (v1.3) still works, when used in the preamble.
+
+\begin{center}
+    \begin{tikzpicture}
+        \node (old) at (0,0) {\includegraphics[height=1.6cm]{template/universis.old}};
+        \node (new) at (9.5,0) {\includegraphics[height=1.6cm]{template/universis}};
+        \draw[<-, thick, shorten <=4mm, shorten >=4mm] (old.east) -- node[above=1mm] {\texttt{oldlogo}} (new.west);
+    \end{tikzpicture}
+\end{center}
+
+
+
+
+\section{Language localization}\label{sec:language}
+
+This template supports localization in both \textbf{English} and \textbf{Italian}. By default, the template uses \textbf{English}.
+To select a different language, use the option when loading the document class:
+
+\begin{lstlisting}[language=TeX]
+\documentclass[
+    language=italian,
+]{unipd-thesis-modern}
+\end{lstlisting}
+
+The selected language is passed to \texttt{babel}, which automatically localizes all standard \LaTeX{} elements, including chapter and section names, figure and table captions, the table of contents, bibliography titles, dates, and hyphenation rules.
+
+In addition, the template localizes all custom text that is not handled by \texttt{babel}, such as \emph{Supervisor}, \emph{Co-supervisor}, \emph{Academic Year}, and \emph{Student ID}.\\
+
+You can extend the template to support additional languages by creating a new localization file in the \texttt{template/} directory. The file name must match one of the languages supported by \texttt{babel} (for example, \texttt{french.tex} or \texttt{german.tex}).
+
+Inside this file, define all language-specific macros used by the template, following the structure of the existing localization files (e.g., \texttt{english.tex} and \texttt{italian.tex}). Once the file has been added, the new language can be selected through the \texttt{language} option of the document class.
+
+
+
+
+\section{PDF/A compliance}\label{sec:pdfa}
+
+The University submission system requires the final manuscript to be provided as a PDF/A compliant document.
+For this reason, this template enforces the \textbf{PDF/A-2b} standard at compilation time through the \verb|pdfx| package.
+
+To verify compliance of the generated PDF, you may use an online validation service such as
+\href{https://www.pdfforge.org/online/en/validate-pdfa}{pdfforge PDF/A validator}.\\
+
+\noindent
+\textbf{Compiler compatibility.}
+As of 2026, some incompatibilities have been observed between PDF/A generation and the \verb|pdfLaTeX| compiler when using the Palatino text font package \verb|newpxtext| adopted by this template.
+These issues may result in PDF/A validation errors related to embedded font consistency.
+
+For this reason, the recommended compiler for this template is \textbf{LuaLaTeX}, which provides full compatibility with the default font configuration and generally produces valid PDF/A output without requiring further modifications.
+
+If LuaLaTeX is not available, the following alternatives may be considered:
+
+\begin{itemize}
+    \item \textbf{Use pdfLaTeX with \texttt{mathpazo}.}  
+    This requires editing the template class file and replacing \verb|newpxtext| with \verb|mathpazo| (already included as a commented alternative). This configuration is PDF/A compliant, although it produces slightly different text and mathematical typography.
+
+    \item \textbf{Post-process the generated PDF.}  
+    If your document relies on packages or graphical features that interfere with PDF/A compliance (for instance transparency effects or unsupported font configurations), you may generate a standard PDF and convert it afterward using an external PDF/A conversion service such as
+    \href{https://www.pdfforge.org/online/en/pdf-to-pdfa}{pdfforge PDF/A converter}.
+\end{itemize}
+
+The available PDF/A workflows are summarized in Table~\ref{tab:pdfa}.
+
+\begin{table}[h!]
+\small
+\centering
+\def\arraystretch{1.4}
+\begin{tabular}{c|p{2.8cm}|c|c}\hline
+\textbf{Option} & \textbf{Font package} & \textbf{pdfLaTeX} & \textbf{LuaLaTeX (recommended)} \\
+\hline\hline
+1 & \verb|newpxtext| 
+& Known PDF/A compatibility issues 
+& Works out of the box \\
+\hline
+2 & \verb|mathpazo| 
+& Works out of the box 
+& Works out of the box \\
+\hline
+3 & \multicolumn{3}{c}{Use external conversion to PDF/A on compiled document.}\\
+\hline
+\end{tabular}
+\caption{\label{tab:pdfa}Available workflows for PDF/A-compliant document generation.}
+\end{table}
+
+
+\section{PhD cover}\label{sec:phdcover}
+
+The PhD school requires a specific title page, following the \emph{facsimile frontespizio tesi PhD} provided by the school.
+To use it instead of the default cover, enable the \texttt{phdcover} option of the document class:
+
+\begin{lstlisting}[language=TeX]
+\documentclass[
+    phdcover,
+]{unipd-thesis-modern}
+\end{lstlisting}
+
+The PhD cover uses the following fields, in addition to \verb|\title|, \verb|\author|, \verb|\advisor| and \verb|\coadvisor|:
+
+\begin{lstlisting}[language=TeX]
+\department{Department of Physics and Astronomy ``G. Galilei''}
+\phdCourse{Physics}
+\phdCurriculum{Theoretical Physics}  % optional
+\phdSeries{XXXIX}
+\phdCoordinator{Prof. Name Surname}
+% optional, only for grants financed by external institutions:
+\phdFunding{Thesis written with the financial contribution of ...}
+\end{lstlisting}
+
+Optional fields are omitted from the page when left empty, together with the space around them.
+Fields spanning more lines (for instance, a long title or funding sentence) push the following elements down.
+
+The labels follow the selected language (Section~\ref{sec:language}), and each of them can be overridden with \verb|\setphdlabel{<key>}{<text>}|, where the key is one of \texttt{course}, \texttt{curriculum}, \texttt{series}, \texttt{coordinator}, \texttt{supervisor}, \texttt{cosupervisor}, \texttt{student}.
+For instance, to use the feminine form of the student label in Italian, add to the preamble:
+\begin{lstlisting}[language=TeX]
+\setphdlabel{student}{Dottoranda:}
+\end{lstlisting}
+
+
+
+\section{Stylistic customizations}\label{sec:custom}
+
+The following options of the document class tweak the look of the document.
+They are all independent of each other, and the style options are off by default:
+
+\begin{lstlisting}[language=TeX]
+\documentclass[
+    textwidth=156mm, % width of the text block
+    chapterskip=7mm, % space between chapter title and text
+    boxedsections,   % section numbers inside a coloured box
+    boxedcaptions,   % coloured square before caption labels
+    thmtriangles,    % triangle markers in theorem headings
+]{unipd-thesis-modern}
+\end{lstlisting}
+
+The \texttt{main.tex} of this demo enables some of them, so that you can see their effect in this document.
+
+\subsection{Text width}
+
+The \texttt{textwidth} option sets the width of the text block (\texttt{156mm} by default).
+The horizontal margins are then computed automatically: a gutter of 10\,mm is added on the binding side, and the remaining space is split equally between the inner and outer margins.
+For instance, on A4 paper, \texttt{textwidth=156mm} gives inner and outer margins of 32\,mm and 22\,mm, while \texttt{textwidth=150mm} gives 35\,mm and 25\,mm.
+The chapter headings follow the margins automatically.
+
+\subsection{Chapter spacing}
+
+The \texttt{chapterskip} option sets the space between the title of a chapter and the text that follows.
+It is measured from the baseline of the last line of the title to the top of the capital letters of the first line of text, so it is the same for titles spanning one or more lines.
+The default is quite large (\texttt{27.5mm}), while a smaller value like \texttt{chapterskip=7mm} gives a more compact look, which might be preferred for shorter documents like a Bachelor thesis.
+
+\subsection{Boxed sections}
+
+With \texttt{boxedsections}, the section numbers are printed inside a coloured box.
+Unnumbered sections (\verb|\section*|) are not affected.
+Below, a section heading with the default style (left) and with the option (right):
+
+\begin{center}
+    \begin{tikzpicture}
+        \draw[->, thick] (-1.5,0) -- node[above=1mm] {\texttt{boxedsections}} (1.5,0);
+        \node[anchor=east, draw=black!25, rounded corners=2pt, inner sep=8pt] at (-1.8,0)
+            {\normalfont\Large\bfseries 1.3\hspace{0.8em}Section title};
+        \node[anchor=west, draw=black!25, rounded corners=2pt, inner sep=8pt] at (1.8,0)
+            {\normalfont\Large\bfseries\colorbox{boxedColor}{\color{boxedTextColor}\kern0.15em 1.3\kern0.15em}\hspace{0.8em}Section title};
+    \end{tikzpicture}
+\end{center}
+
+\subsection{Boxed captions}
+
+With \texttt{boxedcaptions}, a small coloured square is printed before the label of every caption: figures, tables, code listings and algorithms (also those of the \texttt{algorithm2e} package).
+Below, a caption with the default style (left) and with the option (right):
+
+\begin{center}
+    \begin{tikzpicture}
+        \draw[->, thick] (-1.5,0) -- node[above=1mm] {\texttt{boxedcaptions}} (1.5,0);
+        \node[anchor=east, draw=black!25, rounded corners=2pt, inner sep=8pt] at (-1.8,0)
+            {\small\textbf{Figure 2.1:} A nice plot.};
+        \node[anchor=west, draw=black!25, rounded corners=2pt, inner sep=8pt] at (1.8,0)
+            {\small{\color{boxedColor}\rule{0.73em}{0.73em}}\hspace*{0.67em}\textbf{Figure 2.1:} A nice plot.};
+    \end{tikzpicture}
+\end{center}
+You can see the effect on all the floating objects of this document, for instance Table~\ref{tab:pdfa}.
+
+The colours of the boxes are \texttt{boxedColor} (by default, the main colour of the template, see Section~\ref{sec:color}) and \texttt{boxedTextColor} (the number inside the section box, white by default).
+You can change them in the preamble, for instance with \verb|\colorlet{boxedColor}{orange}|.
+
+\subsection{Theorem markers}
+
+With \texttt{thmtriangles}, a small triangle is printed before the heading of theorem-like environments. Proofs keep the standard end-of-proof square.
+The option loads the \texttt{amsthm} package, so you can define your environments with \verb|\newtheorem| as usual (see \texttt{custom-symbols.tex}).
+Below, a proposition with its proof in the default style (left) and with the option (right):
+
+\begin{center}
+    \begin{tikzpicture}
+        \draw[->, thick] (-1.2,0) -- node[above=1mm] {\texttt{thmtriangles}} (1.2,0);
+        \node[anchor=east, draw=black!25, rounded corners=2pt, inner sep=8pt] at (-1.5,0)
+            {\parbox{5.2cm}{\small\raggedright
+                \textbf{Proposition 1.} \textit{The sum of two even numbers is even.}\par\smallskip
+                \textit{Proof.} Let $2a$ and $2b$ be even. Then $2a+2b = 2(a+b)$.\hfill$\square$}};
+        \node[anchor=west, draw=black!25, rounded corners=2pt, inner sep=8pt] at (1.5,0)
+            {\parbox{5.2cm}{\small\raggedright
+                \textcolor{thmMarkerColor}{$\blacktriangleright$}\nobreakspace\textbf{Proposition 1.} \textit{The sum of two even numbers is even.}\par\smallskip
+                \textit{Proof.} Let $2a$ and $2b$ be even. Then $2a+2b = 2(a+b)$.\hfill$\square$}};
+    \end{tikzpicture}
+\end{center}
+
+The marker is applied to the \texttt{plain}, \texttt{definition} and \texttt{remark} theorem styles, and its colour is \texttt{thmMarkerColor}.
+Note that the template already defines an \texttt{example} box (Section~\ref{sec:boxes}), so pick a different name for an \emph{example} theorem environment.
+
+\subsection{Colors}\label{sec:color}
+
+The template is defined around color identifiers. \texttt{mainColor} is set to the classic red color of the UniPD color palette.
+By default, the color of the rectangle in the Chapter headlines and the color of the box in the Part page are inherited from the main color,
+\begin{lstlisting}[language={[latex]TeX}]
+\colorlet{chapterColor}{mainColor}
+\colorlet{partBoxColor}{mainColor}
+\end{lstlisting}
+which you can change by redefining the color inside the \texttt{.cls} template:
+\begin{lstlisting}[language={[latex]TeX}]
+\definecolor{chapterColor}{RGB}{255, 187, 0}
+\end{lstlisting}
+
+The options described above define some additional colours, all of which can be changed in the preamble with \verb|\colorlet|:
+\begin{itemize}
+    \item \texttt{boxedColor} and \texttt{boxedTextColor}, for the boxes of \texttt{boxedsections} and \texttt{boxedcaptions};
+    \item \texttt{thmMarkerColor}, for the triangles of \texttt{thmtriangles};
+    \item \texttt{sealColor}, for the seal on top of the PhD cover (Section~\ref{sec:phdcover}).
+\end{itemize}
+
+
+
+
+\section{Writing text}\label{sec:text}
 
 I assume you already know how to use \LaTeX, so I won't write a lot.
 Some \emph{words} are more important than others, so you might want to \emph{emphasize} them with the \verb|\emph| command.
@@ -52,7 +300,7 @@ all the time...
 
 
 
-\subsection{Theorem support}
+\subsection{Theorem support}\label{sec:theorems}
 
 You might input some theorem!
 
@@ -91,20 +339,6 @@ In the previous example, the command \verb|\gls{acronym-label}| will print:
 \end{itemize}
 
 It is possible to reset the counter for all the acronyms with \verb|\glsresetall|, or to reset the counter for a specific acronym with \verb|\glsreset{acronym-label}|.
-
-\section{Colors}\label{sec:color}
-
-The template is defined around color identifiers. \texttt{mainColor} is set to the classic red color of the UniPD color palette.
-By default, the color of the rectangle in the Chapter headlines and the color of the box in the Part page are inherited from the main color,
-\begin{lstlisting}[language={[latex]TeX}]
-\colorlet{chapterColor}{mainColor}
-\colorlet{partBoxColor}{mainColor}
-\end{lstlisting}
-which you can change by redefining the color inside the \texttt{.cls} template:
-\begin{lstlisting}[language={[latex]TeX}]
-\definecolor{chapterColor}{RGB}{255, 187, 0}
-\end{lstlisting}
-
 
 \section{References and floating objects}
 
@@ -195,7 +429,7 @@ spin indexing&N&label&sign of $J_k$&$\theta$\\\hline
     \caption{\label{tab:demo-draw} Selected instances of LHZ models that are considered in the following analysis. The constraints are fixed to $C_l=-2$ and the magnitude of the local fields to $|J_k|=1$. The signs of $J_k$ that fully determine the instance are reported in the table, along with the label of the instance and its ``hardness'' $\theta$. The reference study case is LHZ6M.}
 \end{table}
 
-\section{Special boxes}
+\section{Special boxes}\label{sec:boxes}
 
 The template offers special environments for important text and comments...
 \begin{info}
@@ -212,80 +446,3 @@ The template integrates \texttt{listings} as the default environment for code sn
 def half(n: int): # comment
     return "the half is" + str(n//2)
 \end{lstlisting}
-
-
-\section{PDF/A compliance}
-
-The University submission system requires the final manuscript to be provided as a PDF/A compliant document.
-For this reason, this template enforces the \textbf{PDF/A-2b} standard at compilation time through the \verb|pdfx| package.
-
-To verify compliance of the generated PDF, you may use an online validation service such as
-\href{https://www.pdfforge.org/online/en/validate-pdfa}{pdfforge PDF/A validator}.\\
-
-\noindent
-\textbf{Compiler compatibility.}
-As of 2026, some incompatibilities have been observed between PDF/A generation and the \verb|pdfLaTeX| compiler when using the Palatino text font package \verb|newpxtext| adopted by this template.
-These issues may result in PDF/A validation errors related to embedded font consistency.
-
-For this reason, the recommended compiler for this template is \textbf{LuaLaTeX}, which provides full compatibility with the default font configuration and generally produces valid PDF/A output without requiring further modifications.
-
-If LuaLaTeX is not available, the following alternatives may be considered:
-
-\begin{itemize}
-    \item \textbf{Use pdfLaTeX with \texttt{mathpazo}.}  
-    This requires editing the template class file and replacing \verb|newpxtext| with \verb|mathpazo| (already included as a commented alternative). This configuration is PDF/A compliant, although it produces slightly different text and mathematical typography.
-
-    \item \textbf{Post-process the generated PDF.}  
-    If your document relies on packages or graphical features that interfere with PDF/A compliance (for instance transparency effects or unsupported font configurations), you may generate a standard PDF and convert it afterward using an external PDF/A conversion service such as
-    \href{https://www.pdfforge.org/online/en/pdf-to-pdfa}{pdfforge PDF/A converter}.
-\end{itemize}
-
-The available PDF/A workflows are summarized in Table~\ref{tab:pdfa}.
-
-\begin{table}[h!]
-\small
-\centering
-\def\arraystretch{1.4}
-\begin{tabular}{c|p{2.8cm}|c|c}\hline
-\textbf{Option} & \textbf{Font package} & \textbf{pdfLaTeX} & \textbf{LuaLaTeX (recommended)} \\
-\hline\hline
-1 & \verb|newpxtext| 
-& Known PDF/A compatibility issues 
-& Works out of the box \\
-\hline
-2 & \verb|mathpazo| 
-& Works out of the box 
-& Works out of the box \\
-\hline
-3 & \multicolumn{3}{c}{Use external conversion to PDF/A on compiled document.}\\
-\hline
-\end{tabular}
-\caption{\label{tab:pdfa}Available workflows for PDF/A-compliant document generation.}
-\end{table}
-
-
-\section{Language}
-
-This template supports localization in both \textbf{English} and \textbf{Italian}. By default, the template uses \textbf{English}.
-To select a different language, use the \texttt{language} option when loading the document class:
-
-\begin{lstlisting}[language=TeX]
-\documentclass[
-    language=italian,
-]{unipd-thesis-modern}
-\end{lstlisting}
-
-The selected language is passed to \texttt{babel}, which automatically localizes all standard \LaTeX{} elements, including chapter and section names, figure and table captions, the table of contents, bibliography titles, dates, and hyphenation rules.
-
-In addition, the template localizes all custom text that is not handled by \texttt{babel}, such as \emph{Supervisor}, \emph{Co-supervisor}, \emph{Academic Year}, and \emph{Student ID}.\\
-
-You can extend the template to support additional languages by creating a new localization file in the \texttt{template/} directory. The file name must match one of the languages supported by \texttt{babel} (for example, \texttt{french.tex} or \texttt{german.tex}).
-
-Inside this file, define all language-specific macros used by the template, following the structure of the existing localization files (e.g., \texttt{english.tex} and \texttt{italian.tex}). Once the file has been added, the new language can be selected through the \texttt{language} option of the document class.
-
-
-\section{Logos}
-
-By default, the template is using the new logo of the University of Padova.
-
-If required by your department/school, you can switch to the old logo by uncommenting the \verb|\useoldlogo| command in \texttt{main.tex} preamble.

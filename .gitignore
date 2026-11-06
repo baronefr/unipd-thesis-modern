@@ -308,3 +308,6 @@ TSWLatexianTemp*
 
 # macos fs
 .DS_Store
+
+# dev
+*.ignore
