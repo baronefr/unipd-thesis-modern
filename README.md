@@ -23,13 +23,14 @@ Some departments/schools still require the old ones: to use them, enable the `ol
 ]{unipd-thesis-modern}
 ```
 
-The option switches all the logos at once (cover logo, background seal, PhD cover seal).
+The option switches all the logos at once (cover logo, background seals of both covers).
 I advice you check the logo requirement with your school/department before submitting your thesis.
 
 
 ### PhD cover
 
 The PhD school requires a specific title page (see the *facsimile frontespizio tesi PhD* provided by the school).
+The template prints the required content with a cleaner layout: University logo on top, course information in small caps, the seal in the background (color is `sealColor`) and the names at the bottom.
 To use it instead of the default cover, enable the `phdcover` option:
 
 ```latex

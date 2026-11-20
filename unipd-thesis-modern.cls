@@ -1,6 +1,6 @@
 % =============================================================
 %   LaTeX thesis template    ----------------------------------
-%   ver 1.4.0 //  major review 1.4  //  November 2026, 6th
+%   ver 1.4.1 //  major review 1.4  //  November 2026, 20th
 %
 %   by Francesco Barone, github.com/baronefr
 %   released under CC licence
@@ -116,7 +116,7 @@
     \colorlet{boxedColor}{mainColor}     % used by boxedcaptions & boxedsections
     \colorlet{boxedTextColor}{white}     % text inside the section number box
     \colorlet{thmMarkerColor}{black!70}  % triangles of the thmtriangles option
-    \colorlet{sealColor}{black!70}       % seal on the phdcover title page
+    \colorlet{sealColor}{black!5}        % background seal of the covers (seal.pdf has no colour of its own)
     \colorlet{pageNumberColor}{black}    % page number of the pagenumberline option
     %   Bookkeeping: unipd color is {RGB}{155, 0, 20}
 
@@ -217,19 +217,15 @@
 \phdFunding{}
 
 % default logo assets (modern)
-\def\UPDlogoUnipdbg{template/unipdbg}
-\def\UPDlogoUniversis{template/universis}
-% seal for the phdcover option: same drawing as unipdbg.pdf, but without its own
-% colour/opacity, so that it takes the current colour (sealColor)
 \def\UPDlogoSeal{template/seal}
+\def\UPDlogoUniversis{template/universis}
 
 % switch to legacy logo assets (.old.pdf variants)
 %   use the class option oldlogo; the \useoldlogo command is kept for
 %   backward compatibility (v1.3) and does the same when used in the preamble
 \newcommand{\useoldlogo}{%
-  \gdef\UPDlogoUnipdbg{template/unipdbg.old}%
-  \gdef\UPDlogoUniversis{template/universis.old}%
   \gdef\UPDlogoSeal{template/seal.old}%
+  \gdef\UPDlogoUniversis{template/universis.old}%
 }
 \makeatletter
 \ifunipd@oldlogo
@@ -543,7 +539,7 @@
 
     % add watermark
     \thiswatermark{\centering
-    \put(-300,-775){\includegraphics[width=1.4\linewidth]{\UPDlogoUnipdbg}} % (-297,-780)
+    \put(-300,-775){\color{sealColor}\includegraphics[width=1.4\linewidth]{\UPDlogoSeal}} % (-297,-780)
     }
 
     % logo(s)
@@ -624,89 +620,71 @@
 
 
 % -- PHD TITLE PAGE --
-% Layout of the PhD school facsimile (facsimile_frontespizio_tesi_phd):
-% seal on top, centred course info and title, names at the bottom.
-% Sizes and margins are taken from the official .docx template.
+% Content required by the PhD school facsimile (facsimile_frontespizio_tesi_phd),
+% with a cleaner layout: University logo on top, course info in small caps,
+% large seal in the background, names in a two-column block at the bottom.
 \newcommand{\makephdtitle} {
     \newgeometry{
-        top=62.7mm, bottom=12.5mm,
-        inner=15mm, outer=15mm,
+        top=24mm, bottom=52mm,
+        inner=30mm, outer=30mm,
         headheight=0pt, headsep=0pt, footskip=0pt
     }
     \fancyhf{}
     \thispagestyle{empty}
 
-    % seal, centred in the top margin (drawn in page coordinates when the
+    % background seal, centred on the page (drawn in page coordinates when the
     % page is shipped out, so it does not need a second compilation)
     \AddToHookNext{shipout/background}{%
         \put(0,0){\begin{tikzpicture}[overlay]
-            \node[anchor=north,inner sep=0pt] at (0.5\paperwidth,-13.1mm)
-                {\color{sealColor}\includegraphics[width=41.8mm]{\UPDlogoSeal}};
+            \node[inner sep=0pt] at (0.5\paperwidth,-0.53\paperheight)
+                {\color{sealColor}\includegraphics[width=0.9\paperwidth]{\UPDlogoSeal}};
         \end{tikzpicture}}%
     }%
 
     % The page is a stack of blocks. The gap before a block is added only if
     % the block is printed, so empty fields leave no holes. Blocks spanning more
-    % lines push the following ones down; if the page gets too full, the gaps
-    % shrink (up to half their size) before anything spills to the next page.
+    % lines push the following ones down; the names stay anchored at the bottom.
     {\centering
-        % university and department
-        {\fontsize{18}{21}\selectfont \UPD@university\par}
-        \ifx\@department\empty \else
-            \UPD@phdgap{8pt}
-            {\fontsize{16}{19}\selectfont \@department\par}
-        \fi
+        % logo
+        \includegraphics[height=22mm]{\UPDlogoUniversis}\par
+        \vspace{14mm}
 
-        % course, curriculum and series (block skipped if all are empty)
-        \@tempswafalse
-        \ifx\@phdCourse\empty \else \@tempswatrue \fi
-        \ifx\@phdCurriculum\empty \else \@tempswatrue \fi
-        \ifx\@phdSeries\empty \else \@tempswatrue \fi
-        \if@tempswa
-            \UPD@phdgap{63pt}
-            {\fontsize{17}{21}\selectfont
-                \ifx\@phdCourse\empty \else
-                    \UPD@phdcourse~\@phdCourse\par
-                \fi
-                \ifx\@phdCurriculum\empty \else
-                    \UPD@phdcurriculum~\@phdCurriculum\par
-                \fi
-                \ifx\@phdSeries\empty \else
-                    \UPD@phdseries~\@phdSeries\par
-                \fi
-            }
-        \fi
+        % university, department, course, curriculum and series
+        {\normalsize\scshape \linespread{1}\selectfont
+            \UPD@university\par
+            \ifx\@department\empty \else \@department\par \fi
+            \ifx\@phdCourse\empty \else \UPD@phdcourse~\@phdCourse\par \fi
+            \ifx\@phdCurriculum\empty \else \UPD@phdcurriculum~\@phdCurriculum\par \fi
+            \ifx\@phdSeries\empty \else \UPD@phdseries~\@phdSeries\par \fi
+        }
 
         % title
-        \UPD@phdgap{63pt}
-        {\fontsize{20}{24}\selectfont \@title\par}
+        \UPD@phdgap{50mm}
+        {\huge\bfseries \linespread{1}\selectfont \@title\par}
 
         % funding acknowledgement (optional, full sentence given by the user)
-        \ifx\@phdFunding\empty
-            \UPD@phdgap{78pt}
-        \else
-            \UPD@phdgap{78pt}
-            {\fontsize{14}{17}\selectfont \@phdFunding\par}
-            \UPD@phdgap{52pt}
+        \ifx\@phdFunding\empty \else
+            \UPD@phdgap{7mm}
+            {\normalsize \linespread{1}\selectfont \@phdFunding\par}
         \fi
     }
+    \vfill
 
-    % names
-    % (labels in bold, names in regular weight; \parskip spaces the lines)
-    {\fontsize{14}{17}\selectfont
-        \raggedright
-        \setlength{\parskip}{8pt}
-        \ifx\@phdCoordinator\empty \else
-            \textbf{\UPD@phdcoordinator}~\@phdCoordinator\par
-        \fi
-        \ifx\@advisor\empty \else
-            \textbf{\UPD@phdsupervisor}~\@advisor\par
-        \fi
-        \ifx\@coadvisor\empty \else
-            \textbf{\UPD@phdcosupervisor}~\@coadvisor\par
-        \fi
-        \UPD@phdgap{17pt}
-        {\raggedleft \textbf{\UPD@phdstudent}~\@author\par}
+    % names: labels in regular weight, names in bold
+    {\normalsize \linespread{1}\selectfont
+        \noindent\begin{tabular}{@{}l@{\hspace{0.7em}}l@{}}
+            \ifx\@phdCoordinator\empty \else
+                \UPD@phdcoordinator & \textbf{\@phdCoordinator} \\[5.5mm]
+            \fi
+            \ifx\@advisor\empty \else
+                \UPD@phdsupervisor & \textbf{\@advisor} \\[5.5mm]
+            \fi
+            \ifx\@coadvisor\empty \else
+                \UPD@phdcosupervisor & \textbf{\@coadvisor} \\
+            \fi
+        \end{tabular}\par
+        \vspace{9mm}
+        {\raggedleft \UPD@phdstudent~\textbf{\@author}\par}
     }
 
     % leave the same line spacing as \maketitle does, so that the preamble

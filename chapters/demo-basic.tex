@@ -16,7 +16,7 @@ If required by your department/school, you can switch to the old logo with the \
     oldlogo,
 ]{unipd-thesis-modern}
 \end{lstlisting}
-The option switches all the logos used by the template at once: the logo on the cover, the seal in the background of the cover, and the seal on top of the PhD cover (Section~\ref{sec:phdcover}).
+The option switches all the logos used by the template at once: the logo on the cover, the seal in the background of the cover, and the seal in the background of the PhD cover (Section~\ref{sec:phdcover}).
 Below, the new logo of the University of Padova (right), used by default, and the old one (left), set by the \texttt{oldlogo} option.
 For backward compatibility, the \verb|\useoldlogo| command of previous versions of the template (v1.3) still works, when used in the preamble.
 
@@ -105,7 +105,8 @@ The available PDF/A workflows are summarized in Table~\ref{tab:pdfa}.
 
 \section{PhD cover}\label{sec:phdcover}
 
-The PhD school requires a specific title page, following the \emph{facsimile frontespizio tesi PhD} provided by the school.
+The PhD school requires a specific title page, with the content of the \emph{facsimile frontespizio tesi PhD} provided by the school.
+The template arranges it in a cleaner layout: the University logo on top, the course information in small caps, the seal in the background and the names at the bottom.
 To use it instead of the default cover, enable the \texttt{phdcover} option of the document class:
 
 \begin{lstlisting}[language=TeX]
@@ -253,7 +254,7 @@ The options described above define some additional colours, all of which can be 
     \item \texttt{boxedColor} and \texttt{boxedTextColor}, for the boxes of \texttt{boxedsections} and \texttt{boxedcaptions};
     \item \texttt{thmMarkerColor}, for the triangles of \texttt{thmtriangles};
     \item \texttt{pageNumberColor}, for the page numbers of \texttt{pagenumberline} (defaults to \texttt{mainColor});
-    \item \texttt{sealColor}, for the seal on top of the PhD cover (Section~\ref{sec:phdcover}).
+    \item \texttt{sealColor}, for the background seal of the covers (black!5 by default, Section~\ref{sec:phdcover}).
 \end{itemize}
 
 
