@@ -42,6 +42,7 @@
 \DeclareBoolOption[false]{phdcover} % title page following the PhD school facsimile
 \DeclareBoolOption[false]{thmtriangles} % triangle marker in theorem headings
 \DeclareBoolOption[false]{oldlogo} % use the pre-2026 logos of the University
+\DeclareBoolOption[false]{pagenumberline} % bold page number with a line to the page edge
 
 \ProcessKeyvalOptions*
 
@@ -116,7 +117,8 @@
     \colorlet{boxedTextColor}{white}     % text inside the section number box
     \colorlet{thmMarkerColor}{black!70}  % triangles of the thmtriangles option
     \colorlet{sealColor}{black!70}       % seal on the phdcover title page
-    %   Bookeeping: unipd color is {RGB}{155, 0, 20}
+    \colorlet{pageNumberColor}{black}    % page number of the pagenumberline option
+    %   Bookkeeping: unipd color is {RGB}{155, 0, 20}
 
 
 % mathematics
@@ -385,6 +387,9 @@
     {0.8em}{#1}
   \titleformat{name=\section,numberless}
     {\normalfont\Large\bfseries}{}{0pt}{#1}
+%\else % I like this, but not with this color scheme
+%  \titleformat{\section}{\normalfont\Large\bfseries}{\color{mainColor}\thesection}{0.8em}{#1}
+%  \titleformat{name=\section,numberless}{\normalfont\Large\bfseries}{}{0pt}{#1}
 \fi
 
 % option boxedcaptions: coloured square before caption labels
@@ -421,10 +426,41 @@
 \fi
 \makeatother
 
+% page number in the footer
+% With the pagenumberline option, the page number is bold and coloured, with a
+% line below it that runs from the number to the outer edge of the paper.
+\makeatletter
+\newlength\UPDpagelinewidth  \setlength\UPDpagelinewidth{1.4pt} % thickness of the line
+\newlength\UPDpagelinesep    \setlength\UPDpagelinesep{2.5pt}   % gap between the number and the line
+\newsavebox\UPD@pagebox
+\newcommand*\UPD@pageline[1]{% line of width #1, below the baseline
+  \rule[\dimexpr-\UPD@pagedepth-\UPDpagelinesep-\UPDpagelinewidth\relax]{#1}{\UPDpagelinewidth}}
+\newlength\UPD@pagedepth
+\ifunipd@pagenumberline
+  \newcommand*\UPDpagenumber{%
+    \sbox\UPD@pagebox{\normalfont\bfseries\color{pageNumberColor}\thepage}% \bfseries maybe?
+    \setlength\UPD@pagedepth{\dp\strutbox}% same position for all numbers
+    \begingroup\color{pageNumberColor}%
+    \ifodd\value{page}% outer margin on the right
+      \usebox\UPD@pagebox
+      \rlap{\hskip-\wd\UPD@pagebox
+        \UPD@pageline{\dimexpr\wd\UPD@pagebox+\paperwidth
+          -1in-\hoffset-\oddsidemargin-\textwidth\relax}}%
+    \else % outer margin on the left
+      \llap{\UPD@pageline{\dimexpr1in+\hoffset+\evensidemargin\relax}}%
+      \rlap{\UPD@pageline{\wd\UPD@pagebox}}%
+      \usebox\UPD@pagebox
+    \fi
+    \endgroup}
+\else
+  \newcommand*\UPDpagenumber{\thepage}
+\fi
+\makeatother
+
 % style for headers and footers
 \newcommand{\setDefaultHF} {
     \fancyhf{}
-    \fancyfoot[RO, LE]{\thepage}
+    \fancyfoot[RO, LE]{\UPDpagenumber}
     \fancyhead[LO]{{\footnotesize\nouppercase{\rightmark}}}
     \fancyhead[RE]{{\bfseries\footnotesize\leftmark}}
 }
@@ -444,7 +480,7 @@
 % -- FRONTMATTER --
 \fancypagestyle{plain}{%
     \fancyhf{}
-    \fancyfoot[LE,RO]{\thepage}
+    \fancyfoot[LE,RO]{\UPDpagenumber}
     \renewcommand{\headrulewidth}{0pt}
 }
 
@@ -463,7 +499,7 @@
     \pagestyle{plain}
     \setlength{\headwidth}{\textwidth}
     \fancyhf{}
-    \fancyfoot[RO, LE] {\thepage}
+    \fancyfoot[RO, LE] {\UPDpagenumber}
     
     % custom titles 
     \def\abstractname{Abstract}

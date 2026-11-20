@@ -149,6 +149,7 @@ They are all independent of each other, and the style options are off by default
     boxedsections,   % section numbers inside a coloured box
     boxedcaptions,   % coloured square before caption labels
     thmtriangles,    % triangle markers in theorem headings
+    pagenumberline,  % bold page number with a line to the page edge
 ]{unipd-thesis-modern}
 \end{lstlisting}
 
@@ -225,6 +226,15 @@ Below, a proposition with its proof in the default style (left) and with the opt
 The marker is applied to the \texttt{plain}, \texttt{definition} and \texttt{remark} theorem styles, and its colour is \texttt{thmMarkerColor}.
 Note that the template already defines an \texttt{example} box (Section~\ref{sec:boxes}), so pick a different name for an \emph{example} theorem environment.
 
+\subsection{Page numbers}
+
+With \texttt{pagenumberline}, the page number is printed in bold and in colour, with a line below it that runs from the number to the outer edge of the paper, as in the footer of this page.
+The colour is \texttt{pageNumberColor}, and the thickness of the line and its distance from the number can be changed with
+\begin{lstlisting}[language={[latex]TeX}]
+\setlength{\UPDpagelinewidth}{1.4pt}
+\setlength{\UPDpagelinesep}{2.5pt}
+\end{lstlisting}
+
 \subsection{Colors}\label{sec:color}
 
 The template is defined around color identifiers. \texttt{mainColor} is set to the classic red color of the UniPD color palette.
@@ -242,6 +252,7 @@ The options described above define some additional colours, all of which can be 
 \begin{itemize}
     \item \texttt{boxedColor} and \texttt{boxedTextColor}, for the boxes of \texttt{boxedsections} and \texttt{boxedcaptions};
     \item \texttt{thmMarkerColor}, for the triangles of \texttt{thmtriangles};
+    \item \texttt{pageNumberColor}, for the page numbers of \texttt{pagenumberline} (defaults to \texttt{mainColor});
     \item \texttt{sealColor}, for the seal on top of the PhD cover (Section~\ref{sec:phdcover}).
 \end{itemize}
 
